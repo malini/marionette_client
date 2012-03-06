@@ -45,7 +45,24 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementById('mozLink');")
         found_el = self.marionette.find_element("id", "mozLink")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
+
+    def test_child_element(self):
+        test_html = self.marionette.absolute_url("test.html")
+        self.marionette.navigate(test_html)
+        el = self.marionette.find_element("id", "divLink")
+        div = self.marionette.find_element("id", "testDiv")
+        found_el = div.find_element("tag name", "a")
+        self.assertEqual(HTMLElement, type(found_el))
+        self.assertEqual(el.id, found_el.id)
+
+    def test_child_elements(self):
+        test_html = self.marionette.absolute_url("test.html")
+        self.marionette.navigate(test_html)
+        el = self.marionette.find_element("id", "divLink2")
+        div = self.marionette.find_element("id", "testDiv")
+        found_els = div.find_elements("tag name", "a")
+        self.assertTrue(el.id in [found_el.id for found_el in found_els])
 
     def test_tag_name(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -53,7 +70,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementsByTagName('body')[0];")
         found_el = self.marionette.find_element("tag name", "body")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_class_name(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -61,7 +78,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementsByClassName('linkClass')[0];")
         found_el = self.marionette.find_element("class name", "linkClass")
         self.assertEqual(HTMLElement, type(found_el));
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_name(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -69,7 +86,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementsByName('myInput')[0];")
         found_el = self.marionette.find_element("name", "myInput")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
     
     def test_selector(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -77,7 +94,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementById('testh1');")
         found_el = self.marionette.find_element("css selector", "h1")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_link_text(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -85,7 +102,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementById('mozLink');")
         found_el = self.marionette.find_element("link text", "Click me!")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_partial_link_text(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -93,7 +110,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementById('mozLink');")
         found_el = self.marionette.find_element("partial link text", "Click m")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_xpath(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -101,7 +118,7 @@ class TestElements(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementById('mozLink');")
         found_el = self.marionette.find_element("xpath", "id('mozLink')")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_not_found(self):
         test_html = self.marionette.absolute_url("test.html")
@@ -125,25 +142,38 @@ class TestElementsChrome(MarionetteTestCase):
         el = self.marionette.execute_script("return window.document.getElementById('main-window');")
         found_el = self.marionette.find_element("id", "main-window")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
+
+    def test_child_element(self):
+        el = self.marionette.find_element("id", "bundle_brand")
+        parent = self.marionette.find_element("id", "stringbundleset")
+        found_el = parent.find_element("tag name", "stringbundle")
+        self.assertEqual(HTMLElement, type(found_el))
+        self.assertEqual(el.id, found_el.id)
+
+    def test_child_elements(self):
+        el = self.marionette.find_element("id", "bundle_shell")
+        parent = self.marionette.find_element("id", "stringbundleset")
+        found_els = parent.find_elements("tag name", "stringbundle")
+        self.assertTrue(el.id in [found_el.id for found_el in found_els])
 
     def test_tag_name(self):
         el = self.marionette.execute_script("return window.document.getElementsByTagName('window')[0];")
         found_el = self.marionette.find_element("tag name", "window")
         self.assertEqual(HTMLElement, type(found_el))
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_class_name(self):
         el = self.marionette.execute_script("return window.document.getElementsByClassName('editBookmarkPanelHeaderButton')[0];")
         found_el = self.marionette.find_element("class name", "editBookmarkPanelHeaderButton")
         self.assertEqual(HTMLElement, type(found_el));
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_xpath(self):
         el = self.marionette.execute_script("return window.document.getElementById('main-window');")
         found_el = self.marionette.find_element("xpath", "id('main-window')")
         self.assertEqual(HTMLElement, type(found_el));
-        self.assertTrue(el.id, found_el.id)
+        self.assertEqual(el.id, found_el.id)
 
     def test_not_found(self):
         self.assertRaises(NoSuchElementException, self.marionette.find_element, "id", "I'm not on the page")
