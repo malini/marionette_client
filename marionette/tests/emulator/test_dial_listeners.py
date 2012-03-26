@@ -34,17 +34,17 @@ navigator.mozTelephony.addEventListener("incoming", function test_incoming(e) {
 
         # dial the receiver from the sender
         sender.execute_script("""
-window.wrappedJSObject.sender_call = navigator.mozTelephony.dial("%s");
 window.wrappedJSObject.sender_state = [];
+window.wrappedJSObject.sender_call = navigator.mozTelephony.dial("%s");
 window.wrappedJSObject.sender_call.addEventListener("statechange", function test_sender_statechange(e) {
     if (e.call.state == 'disconnected')
         window.wrappedJSObject.sender_call.removeEventListener("statechange", test_sender_statechange);
     window.wrappedJSObject.sender_state.push(e.call.state);
 });
-window.wrappedJSObject.sender_ringing = false;
-window.wrappedJSObject.sender_call.addEventListener("ringing", function test_sender_ringing(e) {
-    window.wrappedJSObject.sender_call.removeEventListener("ringing", test_sender_ringing);
-    window.wrappedJSObject.sender_ringing = e.call.state == 'ringing';
+window.wrappedJSObject.sender_alerting = false;
+window.wrappedJSObject.sender_call.addEventListener("alerting", function test_sender_alerting(e) {
+    window.wrappedJSObject.sender_call.removeEventListener("alerting", test_sender_alerting);
+    window.wrappedJSObject.sender_alerting = e.call.state == 'alerting';
 });
 """ % toPhoneNumber)
 
@@ -73,10 +73,10 @@ function() {
         # Verify the phone number of the incoming call.
         self.assertEqual(received, fromPhoneNumber)
 
-        # At this point, the sender's call should be in a 'ringing' state,
-        # as reflected by both 'statechange' and 'ringing' listeners.
-        self.assertTrue('ringing' in sender.execute_script("return window.wrappedJSObject.sender_state;"))
-        self.assertTrue(sender.execute_script("return window.wrappedJSObject.sender_ringing;"))
+        # At this point, the sender's call should be in a 'alerting' state,
+        # as reflected by both 'statechange' and 'alerting' listeners.
+        self.assertTrue('alerting' in sender.execute_script("return window.wrappedJSObject.sender_state;"))
+        self.assertTrue(sender.execute_script("return window.wrappedJSObject.sender_alerting;"))
 
         # Answer the call and verify that the callstate changes to
         # connected.
