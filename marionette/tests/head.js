@@ -1,5 +1,5 @@
 MARIONETTE_CONTEXT="chrome";
-MARIONETTE_TIMEOUT=60000;
+MARIONETTE_TIMEOUT=120000;
 
 // Must be synchronized with nsIDOMWindowUtils.
 const COMPOSITION_ATTR_RAWINPUT              = 0x02;
@@ -79,12 +79,12 @@ var EventUtils = {
     //  layout/base/tests/test_reftests_with_caret.html
     //  chrome: toolkit/content/tests/chrome/test_findbar.xul
     //  chrome: toolkit/content/tests/chrome/test_popup_anchor.xul
-    if ("SpecialPowers" in window && window.SpecialPowers != undefined) {
+    /*if ("SpecialPowers" in window && window.SpecialPowers != undefined) {
       return SpecialPowers.getDOMWindowUtils(aWindow);
     }
     if ("SpecialPowers" in parent && parent.SpecialPowers != undefined) {
       return parent.SpecialPowers.getDOMWindowUtils(aWindow);
-    }
+    }*/
 
     //TODO: this is assuming we are in chrome space
     return aWindow.QueryInterface(Components.interfaces.nsIInterfaceRequestor).
@@ -248,9 +248,40 @@ var EventUtils = {
 
 function waitForExplicitFinish() {}
 
+var SpecialPowers = {
+  _prefService: Components.classes["@mozilla.org/preferences-service;1"]
+                .getService(Components.interfaces.nsIPrefBranch),
+
+  setBoolPref: function SpecialPowers__setBoolPref(pref, value) {
+    this._prefService.setBoolPref(pref, value);
+  },
+};
+
 var readyAndUnlocked;
 
-// The browser-chrome tests define a test() method but do not explicitly
-// call it, so we do that here.
-test();
+// see http://mxr.mozilla.org/mozilla-central/source/testing/mochitest/browser-test.js#478
+function nextStep(arg) {
+  try {
+    __generator.send(arg);
+  } catch(ex if ex instanceof StopIteration) {
+    finish();
+  } catch(ex) {
+    ok(false, "Unhandled exception: " + ex);
+    finish();
+  }
+}
+
+// see http://mxr.mozilla.org/mozilla-central/source/testing/mochitest/browser-test.js#523
+function requestLongerTimeout() {
+  /* no-op! */
+}
+
+// The browser-chrome tests either start with test() or generatorTest().
+var __generator = null;
+if (typeof(test) != 'undefined')
+  test();
+else if (typeof(generatorTest) != 'undefined') {
+  __generator = generatorTest();
+  __generator.next();
+}
 
