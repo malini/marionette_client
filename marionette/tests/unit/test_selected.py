@@ -45,3 +45,21 @@ class TestSelected(MarionetteTestCase):
         box.click()
         self.assertTrue(box.selected())
 
+class TestSelectedChrome(MarionetteTestCase):
+    def setUp(self):
+        MarionetteTestCase.setUp(self)
+        self.marionette.set_context("chrome")
+
+    def test_selected(self):
+        win = self.marionette.get_window()
+        self.marionette.execute_script("window.open('file:///Users/mdas/code/malini_marionette_client/marionette/www/test.xul', '_blank', 'chrome,centerscreen');")
+        wins = self.marionette.get_windows()
+        wins.remove(win)
+        newWin = wins.pop()
+        self.marionette.switch_to_window(newWin)
+        box = self.marionette.find_element("id", "testBox")
+        self.assertFalse(box.selected())
+        self.assertFalse(self.marionette.execute_script("arguments[0].checked = true;", [box]))
+        self.assertTrue(box.selected())
+        self.marionette.execute_script("window.close();")
+        self.marionette.switch_to_window(win)

@@ -42,3 +42,14 @@ class TestGetAttribute(MarionetteTestCase):
         self.marionette.navigate(test_html)
         l = self.marionette.find_element("id", "mozLink")
         self.assertEqual("mozLink", l.get_attribute("id"))
+
+class TestGetAttributeChrome(MarionetteTestCase):
+    def setUp(self):
+        MarionetteTestCase.setUp(self)
+        self.marionette.set_context("chrome")
+
+    def test_getAttribute(self):
+        el = self.marionette.execute_script("return window.document.getElementById('main-window');")
+        found_el = self.marionette.find_element("id", "main-window")
+        self.assertEqual(el.get_attribute("id"), "main-window")
+
